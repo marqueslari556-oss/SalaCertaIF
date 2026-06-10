@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Sistema de Reservas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .logout {
+            float: right;
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .logout:hover {
+            background-color: #c82333;
+        }
+        .messages {
+            margin-bottom: 20px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .badge {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'logout' %}" class="logout">Sair</a>
+        <h1>Bem-vindo ao Sistema de Reservas!</h1>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="{% if message.tags %}{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <p>Olá, <strong>{{ nome }}</strong>!</p>
+        <p><span class="badge">{{ ocupacao }}</span></p>
+        <p>Você está logado no sistema.</p>
+        <hr>
+        <h3>Funcionalidades disponíveis:</h3>
+        <ul>
+            <li>Consultar salas disponíveis</li>
+            <li>Fazer reservas</li>
+            <li>Visualizar minhas reservas</li>
+        </ul>
+    </div>
+</body>
+</html>

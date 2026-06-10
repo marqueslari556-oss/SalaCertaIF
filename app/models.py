@@ -1,8 +1,10 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password, check_password
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 
 class Ocupacao(models.Model):
-
     nome = models.CharField(max_length=40, verbose_name="Nome da ocupação")
     pode_reservar = models.BooleanField(verbose_name="Pode reservar")
     precisa_aprovacao = models.BooleanField(verbose_name="Precisa de aprovação")
@@ -17,15 +19,23 @@ class Ocupacao(models.Model):
 
 
 class Pessoa(models.Model):
-
     nome = models.CharField(max_length=100, verbose_name="Nome da pessoa")
-    cpf = models.CharField(max_length=14, verbose_name="CPF")
-    email = models.CharField(max_length=50, verbose_name="E-mail")
+    cpf = models.CharField(max_length=14, verbose_name="CPF", unique=True)
+    email = models.CharField(max_length=50, verbose_name="E-mail", unique=True)
     ocupacao = models.ForeignKey(Ocupacao, on_delete=models.CASCADE, verbose_name="Ocupação")
 
+    senha_hash = models.CharField(max_length=128, verbose_name="Senha", blank=True, null=True)
 
     def __str__(self):
         return f"{self.nome}, {self.email}"
+    
+    #AUTENTICAÇÃO -------------------------------------------------------------------
+    
+    def set_senha(self, senha_raw):
+        self.senha_hash = make_password(senha_raw)
+
+    def verificar_senha(self, senha_raw):
+        return check_password(senha_raw, self.senha_hash)
     
     class Meta:
         verbose_name = "Pessoa"
@@ -33,7 +43,6 @@ class Pessoa(models.Model):
 
 
 class Disciplina(models.Model):
-
     nome = models.CharField(max_length=40, verbose_name="Disciplina")
     
     def __str__(self):
@@ -45,7 +54,6 @@ class Disciplina(models.Model):
 
 
 class Curso(models.Model):
-
     nome = models.CharField(max_length=40, verbose_name="Nome do curso")
     
     def __str__(self):
@@ -57,7 +65,6 @@ class Curso(models.Model):
 
 
 class Turma(models.Model):
-
     turma = models.CharField(max_length=10, verbose_name="Turma")
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE, verbose_name="Curso")
     
@@ -70,7 +77,6 @@ class Turma(models.Model):
 
 
 class AlocacaoProfessor(models.Model):
-
     ano_letivo = models.IntegerField(verbose_name="Ano letivo")
     semestre_letivo = models.IntegerField(verbose_name="Semestre letivo")
     pessoa = models.ForeignKey(Pessoa, on_delete=models.CASCADE, verbose_name="Nome da pessoa")
@@ -99,7 +105,6 @@ class Horario(models.Model):
         verbose_name_plural = "Horários"
 
 class TipoConservacao(models.Model):
-
     tipo_conservacao = models.CharField(max_length=30, verbose_name="Conservação")
     prioridade_manutencao = models.CharField(max_length=6, verbose_name="Nível de prioridade")
     
@@ -112,7 +117,6 @@ class TipoConservacao(models.Model):
 
 
 class TipoSala(models.Model):
-
     tipo_sala = models.CharField(max_length=50, verbose_name="Tipo da sala")
 
     def __str__(self):
@@ -125,7 +129,6 @@ class TipoSala(models.Model):
 
 
 class Sala(models.Model):
-    
     numero = models.IntegerField(verbose_name="Número da sala")
     predio = models.CharField(max_length=30, verbose_name="Prédio")
     capacidade = models.IntegerField(verbose_name="Capacidade (pessoas)")
@@ -141,7 +144,6 @@ class Sala(models.Model):
 
 
 class EquipamentoSala(models.Model):
-
     nome_equipamento = models.CharField(max_length=50, verbose_name="Nome do equipamento", default='Sem nome')
     sala = models.ForeignKey(Sala, on_delete=models.CASCADE, verbose_name="Sala")
     quantidade = models.IntegerField(verbose_name="Quantidade de equipamentos")
